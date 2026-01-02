@@ -1,38 +1,33 @@
-export type PickingState = 'draft' | 'waiting' | 'confirmed' | 'assigned' | 'done';
-
 export interface Product {
   id: number;
   name: string;
   barcode: string;
-  standard_price: number;
+  default_code: string;
 }
 
-export interface StockMove {
+export interface PickingLine {
   id: number;
-  product_id: Product;
-  product_uom_qty: number; // Demand
+  product_id: number;
+  product_name: string;
+  product_barcode: string;
+  qty_demand: number;
   qty_done: number;
-  location_id: { id: number; name: string; removal_priority: number };
-  location_dest_id: { id: number; name: string };
-  state: PickingState;
-}
-
-export interface Picking {
-  id: number;
-  name: string;
-  picking_type_code: 'incoming' | 'outgoing' | 'internal';
-  location_id: { id: number; name: string };
-  location_dest_id: { id: number; name: string };
-  state: PickingState;
-  move_lines: StockMove[];
-  company_id: number;
-  intercompany_transfer_ref?: number;
+  location_dest_id: number;
 }
 
 export interface PickingBatch {
   id: number;
   name: string;
-  user_id: { id: number; name: string };
+  user_id: number;
+  company_id: number;
+  company_name: string;
+  lines: PickingLine[];
   state: 'draft' | 'in_progress' | 'done';
-  pickings: Picking[];
+}
+
+export interface ScanResult {
+  success: boolean;
+  message: string;
+  product?: Product;
+  type: 'success' | 'warning' | 'error';
 }

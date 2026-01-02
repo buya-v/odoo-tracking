@@ -5,4 +5,11 @@
 body {
   font-family: 'Inter', sans-serif;
   background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* High-speed scan input optimizations */
+.scan-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(0, 160, 154, 0.25);
 }

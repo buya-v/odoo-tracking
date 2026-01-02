@@ -9,9 +9,8 @@ export default {
       colors: {
         odoo: {
           teal: '#00A09A', // Primary
-          success: '#28A745',
-          warning: '#FFC107',
-          error: '#DC3545',
+          red: '#DC3545',  // Error
+          warning: '#FFC107', // Warning
           dark: '#212529',
         }
       },
