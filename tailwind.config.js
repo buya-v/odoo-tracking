@@ -8,12 +8,13 @@ export default {
     extend: {
       colors: {
         'adv-success': '#28a745',
-        'adv-error': '#dc3545',
         'adv-warning': '#ffc107',
+        'adv-error': '#dc3545',
+        'adv-primary': '#71639e',
       },
-      fontFamily: {
-        mono: ['Roboto Mono', 'monospace'],
-      }
+      spacing: {
+        'touch-target': '48px',
+      },
     },
   },
   plugins: [],

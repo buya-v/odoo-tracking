@@ -2,22 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --adv-inv-success: #28a745;
-  --adv-inv-error: #dc3545;
-  --adv-inv-warning: #ffc107;
-}
-
 body {
   background-color: #f8f9fa;
-  color: #212529;
-}
-
-/* Custom scrollbar for mobile feel */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  font-family: system-ui, -apple-system, sans-serif;
 }
