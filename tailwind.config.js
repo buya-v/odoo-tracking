@@ -7,14 +7,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        'adv-success': '#28a745',
-        'adv-warning': '#ffc107',
-        'adv-error': '#dc3545',
-        'adv-primary': '#71639e',
+        adv: {
+          primary: '#714B67',
+          success: '#00A09D',
+          danger: '#DC3545',
+          warning: '#FFBB33',
+          surface: '#F8F9FA',
+        }
       },
-      spacing: {
-        'touch-target': '48px',
-      },
+      fontSize: {
+        barcode: '1.2rem',
+      }
     },
   },
   plugins: [],

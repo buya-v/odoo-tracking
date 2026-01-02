@@ -1,33 +1,36 @@
-export interface Product {
+export type SyncStatus = 'online' | 'offline' | 'error' | 'syncing';
+
+export interface BatchOperation {
   id: number;
   name: string;
-  barcode: string;
-  default_code: string;
-}
-
-export interface PickingLine {
-  id: number;
-  product_id: number;
-  product_name: string;
-  product_barcode: string;
-  qty_demand: number;
-  qty_done: number;
-  location_dest_id: number;
-}
-
-export interface PickingBatch {
-  id: number;
-  name: string;
+  state: 'draft' | 'in_progress' | 'done' | 'cancel';
   user_id: number;
-  company_id: number;
-  company_name: string;
-  lines: PickingLine[];
-  state: 'draft' | 'in_progress' | 'done';
+  user_name: string;
+  scheduled_date: string;
+  item_count: number;
+  processed_count: number;
 }
 
-export interface ScanResult {
-  success: boolean;
-  message: string;
-  product?: Product;
-  type: 'success' | 'warning' | 'error';
+export interface TrackLog {
+  id: number;
+  name: string;
+  model_name: string;
+  res_id: number;
+  traceback: string;
+  user_id: number;
+  create_date: string;
+}
+
+export interface AppState {
+  batches: BatchOperation[];
+  logs: TrackLog[];
+  syncStatus: SyncStatus;
+  selectedBatchId: number | null;
+  viewMode: 'list' | 'dashboard';
+  setSyncStatus: (status: SyncStatus) => void;
+  selectBatch: (id: number | null) => void;
+  toggleView: () => void;
+  triggerSync: () => Promise<void>;
+  addLog: (log: Omit<TrackLog, 'id' | 'create_date'>) => void;
+  retryAllLogs: () => void;
 }
