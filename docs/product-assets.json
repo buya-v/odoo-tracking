@@ -1,0 +1,270 @@
+{
+  "customerPersona": {
+    "id": "customer-1",
+    "name": "Marcus Thorne",
+    "role": "Director of Supply Chain Operations",
+    "company": "Nexus Distribution Group",
+    "background": "Marcus has over 15 years of experience in global logistics and digital transformation. He has successfully overseen the migration of three legacy ERP systems to Odoo and is currently leading a strategic initiative to consolidate multi-national warehouse operations.",
+    "goals": [
+      "Achieve real-time inventory accuracy across 12 global warehouses and 4 legal entities",
+      "Streamline the picking and packing process using high-speed barcode integration to reduce fulfillment latency",
+      "Ensure the custom codebase is future-proof and compliant with Odoo 18 standards for easy future migrations"
+    ],
+    "painPoints": [
+      "Significant stock discrepancies caused by manual data entry in the existing stock.picking workflow",
+      "Difficulty managing inventory visibility and security across different company branches within a single Odoo instance",
+      "Increasing technical debt from previous low-quality custom modules that do not follow PEP8 or Odoo best practices"
+    ],
+    "successMetrics": [
+      "25% increase in warehouse picking efficiency within the first six months",
+      "Zero security breaches or cross-company data leaks in the multi-company environment",
+      "Passes a comprehensive technical audit for Odoo coding standards and PEP8 compliance"
+    ],
+    "communicationStyle": "Professional and milestone-driven; prefers high-level strategic summaries with attached technical documentation for his IT lead to review.",
+    "technicalLevel": "semi-technical"
+  },
+  "userPersonas": [
+    {
+      "id": "user-1",
+      "name": "Alejandro Rodriguez",
+      "role": "Primary User",
+      "age": "24-30",
+      "occupation": "Warehouse Associate / Picker",
+      "background": "Alejandro has worked in logistics for three years and is responsible for fulfilling hundreds of orders per shift. He spends 90% of his day on his feet moving through the aisles of a high-volume distribution center.",
+      "goals": [
+        "Process picking lists as fast as possible to meet daily KPIs",
+        "Minimize scanning errors that lead to shipping the wrong items",
+        "Easily identify which legal entity a specific pallet belongs to in a shared warehouse space"
+      ],
+      "frustrations": [
+        "Software latency when scanning barcodes in quick succession",
+        "Small UI buttons that are hard to tap while wearing warehouse gloves",
+        "System timeouts that force him to re-login in the middle of a picking route"
+      ],
+      "behaviors": [
+        "Uses a handheld Zebra scanner with a rugged touch screen",
+        "Relies heavily on haptic and audio feedback (beeps) to confirm successful scans",
+        "Skips between screens quickly and ignores non-essential data fields"
+      ],
+      "technicalLevel": "intermediate",
+      "frequency": "daily",
+      "devices": [
+        "mobile",
+        "tablet"
+      ],
+      "accessibility": [
+        "High contrast UI for low-light warehouse corners",
+        "Large tap targets for gloved use"
+      ]
+    },
+    {
+      "id": "user-2",
+      "name": "Sarah Jenkins",
+      "role": "Primary User",
+      "age": "38-45",
+      "occupation": "Inventory Manager",
+      "background": "Sarah oversees stock levels for three regional warehouses and reports directly to the Director of Supply Chain. She transitioned from a manual spreadsheet system to Odoo and values data integrity above all else.",
+      "goals": [
+        "Reconcile physical stock counts with digital records across multiple warehouses",
+        "Manage inter-company stock transfers without creating accounting discrepancies",
+        "Generate real-time reports on fulfillment latency to identify bottlenecks"
+      ],
+      "frustrations": [
+        "Stock moves that lack a clear audit trail of who performed the action",
+        "Difficulty filtering inventory views by specific legal entities/companies",
+        "Manual workarounds required when a barcode is damaged or unreadable"
+      ],
+      "behaviors": [
+        "Monitors the Odoo dashboard on a dual-monitor desktop setup",
+        "Regularly exports stock-move data to verify against financial records",
+        "Sets up automated reordering rules based on real-time tracking data"
+      ],
+      "technicalLevel": "advanced",
+      "frequency": "daily",
+      "devices": [
+        "desktop",
+        "tablet"
+      ],
+      "accessibility": [
+        "Screen reader compatibility for detailed reporting",
+        "Color-blind friendly status indicators"
+      ]
+    },
+    {
+      "id": "user-3",
+      "name": "David Wu",
+      "role": "Secondary User",
+      "age": "40-55",
+      "occupation": "Regional Operations Controller",
+      "background": "David manages the operational compliance for the four legal entities. He doesn't handle the physical goods but is responsible for ensuring the movement of inventory follows tax and corporate governance rules.",
+      "goals": [
+        "Verify that every stock move between Company A and Company B is documented correctly",
+        "Ensure security rules prevent warehouse staff from one entity accessing sensitive data of another",
+        "Audit high-value inventory items periodically to prevent shrinkage"
+      ],
+      "frustrations": [
+        "Lack of granular permissions that sometimes allow unauthorized users to validate transfers",
+        "Inconsistent naming conventions for products across different warehouse locations",
+        "Complex multi-company setups that make simple stock lookups confusing"
+      ],
+      "behaviors": [
+        "Logs in weekly to perform spot-checks and audits",
+        "Uses the search and filter functions extensively to find specific 'stock.picking' records",
+        "Requests custom XML views to see specific financial metadata attached to inventory"
+      ],
+      "technicalLevel": "intermediate",
+      "frequency": "weekly",
+      "devices": [
+        "desktop"
+      ],
+      "accessibility": [
+        "Adjustable font sizes for dense data tables"
+      ]
+    }
+  ],
+  "userStories": [
+    {
+      "id": "OD-001",
+      "personaId": "Alejandro Rodriguez",
+      "epic": "High-Speed Barcode Fulfillment",
+      "title": "Rapid Scan-to-Validate Interface",
+      "story": "As Alejandro Rodriguez, I want a streamlined barcode scanning interface that validates items instantly against the picking list, so that I can process orders rapidly without stopping to check the screen manually.",
+      "acceptanceCriteria": [
+        "Given the custom `stock.picking` form view, when I scan a valid product EAN13 barcode, then the system must automatically increment the `quantity_done` field by 1 via an `onchange` Python method.",
+        "Given a picking operation, when I scan a product that is not in the `move_ids_without_package` list, then the interface must display a red 'Invalid Product' modal and play an error sound.",
+        "Given the scanner interface, when I scan the same item multiple times in rapid succession (under 500ms), then the system must correctly buffer and register all scans without locking the UI thread.",
+        "Given the completion of a picking list, when I scan a specific 'Validate' command barcode, then the system must trigger the `button_validate` method and close the window."
+      ],
+      "priority": "must-have",
+      "estimatedComplexity": "high",
+      "dependencies": [],
+      "status": "draft"
+    },
+    {
+      "id": "OD-002",
+      "personaId": "Alejandro Rodriguez",
+      "epic": "High-Speed Barcode Fulfillment",
+      "title": "Batch Picking XML View Optimization",
+      "story": "As Alejandro Rodriguez, I want a simplified mobile-responsive XML view for batch pickings, so that I can see only the bin location, product name, and required quantity on my handheld scanner.",
+      "acceptanceCriteria": [
+        "Given the mobile scanner resolution (720x1280), when I open the custom `stock.picking` XML view, then unnecessary fields (Source Document, Partner Address) must be hidden using `invisible=\"1\"` attributes.",
+        "Given a list of items to pick, when the view loads, then the items must be sorted primarily by `location_id` (Bin Location) to minimize walking distance.",
+        "Given the custom view, when a line item is fully picked, then the row must turn green visually to indicate completion."
+      ],
+      "priority": "should-have",
+      "estimatedComplexity": "medium",
+      "dependencies": [
+        "OD-001"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "OD-003",
+      "personaId": "Sarah Jenkins",
+      "epic": "Multi-Entity Inventory Governance",
+      "title": "Inter-Company Transfer Automation",
+      "story": "As Sarah Jenkins, I want the system to automatically generate a receipt in Company B when I confirm a delivery from Company A, so that inventory is never in limbo and manual data entry is eliminated.",
+      "acceptanceCriteria": [
+        "Given a Delivery Order from Company A with 'Inter-Company Transit' location as the destination, when the transfer is validated, then a corresponding Incoming Shipment must be created in Company B's database context.",
+        "Given the auto-generated receipt in Company B, when it is created, then the source document field must reference Company A's Delivery Order ID for traceability.",
+        "Given a product with tracking (lots/serials), when the transfer occurs, then the Lot/Serial numbers must propagate from the Delivery Order to the Incoming Shipment without manual re-entry."
+      ],
+      "priority": "must-have",
+      "estimatedComplexity": "high",
+      "dependencies": [],
+      "status": "draft"
+    },
+    {
+      "id": "OD-004",
+      "personaId": "Sarah Jenkins",
+      "epic": "Multi-Entity Inventory Governance",
+      "title": "Global Inventory Pivot View",
+      "story": "As Sarah Jenkins, I want a custom Pivot view that aggregates stock levels across all 12 warehouses, so that I can reconcile physical counts against digital records in a single screen.",
+      "acceptanceCriteria": [
+        "Given the Inventory Reporting menu, when I select the 'Global Stock' view, then I should see a Pivot table grouping products by 'Warehouse' and 'Company'.",
+        "Given the pivot view, when I expand a Warehouse, then I must see the 'Quantity on Hand' and 'Incoming Quantity' columns calculated in real-time.",
+        "Given I am logged in as a user with multi-company access, when I view the report, then it must display data for all active companies selected in the Odoo user switch widget."
+      ],
+      "priority": "should-have",
+      "estimatedComplexity": "medium",
+      "dependencies": [],
+      "status": "draft"
+    },
+    {
+      "id": "OD-005",
+      "personaId": "David Wu",
+      "epic": "Security & Compliance Architecture",
+      "title": "Multi-Company Record Rules",
+      "story": "As David Wu, I want strict Odoo record rules implemented on stock moves, so that warehouse staff from Company A cannot accidentally view or edit picking operations belonging to Company B.",
+      "acceptanceCriteria": [
+        "Given a user assigned strictly to 'Company A', when they query the `stock.picking` model, then the system must return only records where `company_id` matches Company A or is False.",
+        "Given a user attempts to access a specific picking ID via URL manipulation that belongs to a different company, then Odoo must raise an `AccessError`.",
+        "Given the barcode interface, when a user from Company A scans a barcode label generated by Company B, then the system must reject the scan as 'Unauthorized' rather than processing it."
+      ],
+      "priority": "must-have",
+      "estimatedComplexity": "medium",
+      "dependencies": [],
+      "status": "draft"
+    },
+    {
+      "id": "OD-006",
+      "personaId": "David Wu",
+      "epic": "Security & Compliance Architecture",
+      "title": "Field-Level Cost Protection",
+      "story": "As David Wu, I want to hide product cost and valuation fields from the warehouse operators' views, so that sensitive financial data is not exposed to floor staff.",
+      "acceptanceCriteria": [
+        "Given the `stock.picking` form view, when logged in as 'Alejandro Rodriguez' (Group: Stock User), then the fields `standard_price` and `stock_valuation_layer_ids` must not be visible in the XML definition.",
+        "Given the product master data, when a Stock User views a product form, then the 'Cost' field must be replaced with a placeholder or hidden entirely via `groups` attributes in the XML view.",
+        "Given a CSV export action, when a Stock User attempts to export product data, then the cost columns must be excluded from the exportable fields list."
+      ],
+      "priority": "should-have",
+      "estimatedComplexity": "low",
+      "dependencies": [],
+      "status": "draft"
+    },
+    {
+      "id": "OD-007",
+      "personaId": "Sarah Jenkins",
+      "epic": "Multi-Entity Inventory Governance",
+      "title": "Smart Replenishment Logic Model",
+      "story": "As Sarah Jenkins, I want custom logic added to the replenishment model that considers stock in nearby warehouses within the same legal entity before triggering a purchase order, so that we optimize internal stock usage.",
+      "acceptanceCriteria": [
+        "Given a product hits minimum stock level in Warehouse A, when the scheduler runs, then the Python model must check available stock in Warehouse B (same Company) before creating a Request for Quotation (RFQ).",
+        "Given stock is available in Warehouse B, when the rule triggers, then the system must create an Internal Transfer (Resupply) instead of a Purchase Order.",
+        "Given no stock is available in any internal warehouse, when the rule triggers, then the standard Odoo Buy route must execute."
+      ],
+      "priority": "could-have",
+      "estimatedComplexity": "high",
+      "dependencies": [
+        "OD-003"
+      ],
+      "status": "draft"
+    },
+    {
+      "id": "OD-008",
+      "personaId": "Alejandro Rodriguez",
+      "epic": "High-Speed Barcode Fulfillment",
+      "title": "One-Scan Package Putaway",
+      "story": "As Alejandro Rodriguez, I want to scan a package barcode to automatically assign all contained items to a destination location, so that I can shelve incoming goods efficiently.",
+      "acceptanceCriteria": [
+        "Given a pallet with a License Plate (LPN) barcode, when I scan the LPN at a destination location bin, then all `stock.quant` records associated with that package must update their `location_id` to the scanned bin.",
+        "Given the putaway process, when the move is confirmed, then the system must log the user ID and timestamp in the chatter for traceability.",
+        "Given a package containing items for different owners, when I try to put it away, then the system should warn me about mixed ownership."
+      ],
+      "priority": "should-have",
+      "estimatedComplexity": "medium",
+      "dependencies": [
+        "OD-001"
+      ],
+      "status": "draft"
+    }
+  ],
+  "epics": [
+    "High-Speed Barcode Fulfillment",
+    "Multi-Entity Inventory Governance",
+    "Security & Compliance Architecture"
+  ],
+  "createdAt": 1767335403147,
+  "updatedAt": 1767335403147,
+  "version": 1
+}
