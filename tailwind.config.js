@@ -7,15 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        odoo: {
-          teal: '#00A09A', // Primary
-          red: '#DC3545',  // Error
-          warning: '#FFC107', // Warning
-          dark: '#212529',
-        }
+        'adv-success': '#28a745',
+        'adv-error': '#dc3545',
+        'adv-warning': '#ffc107',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        mono: ['Roboto Mono', 'monospace'],
       }
     },
   },

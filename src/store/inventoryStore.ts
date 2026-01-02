@@ -1,119 +1,128 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { PickingBatch, Picking, StockMove } from '../types';
-import { audioFeedback } from '../lib/audio';
-
-// Mock Data
-const MOCK_BATCHES: PickingBatch[] = [
-  {
-    id: 1,
-    name: 'BATCH/001',
-    user_id: { id: 1, name: 'Mitchel Admin' },
-    state: 'in_progress',
-    pickings: [
-      {
-        id: 101,
-        name: 'WH/OUT/001',
-        picking_type_code: 'outgoing',
-        location_id: { id: 1, name: 'WH/Stock', removal_priority: 10 },
-        location_dest_id: { id: 5, name: 'Partner Locations/Customers' },
-        state: 'assigned',
-        company_id: 1,
-        move_lines: [
-          {
-            id: 1001,
-            product_id: { id: 1, name: '[FURN_7888] Desk Stand', barcode: '123456', standard_price: 50 },
-            product_uom_qty: 5,
-            qty_done: 2,
-            location_id: { id: 1, name: 'WH/Stock/Shelf 1', removal_priority: 10 },
-            location_dest_id: { id: 5, name: 'Partner Locations/Customers' },
-            state: 'assigned'
-          },
-          {
-            id: 1002,
-            product_id: { id: 2, name: '[E-COM11] Storage Box', barcode: '987654', standard_price: 15 },
-            product_uom_qty: 10,
-            qty_done: 0,
-            location_id: { id: 2, name: 'WH/Stock/Shelf 2', removal_priority: 5 },
-            location_dest_id: { id: 5, name: 'Partner Locations/Customers' },
-            state: 'assigned'
-          }
-        ]
-      }
-    ]
-  }
-];
+import { PickingBatch, ScanResult, SyncLog } from '../types/odoo';
 
 interface InventoryState {
-  batches: PickingBatch[];
-  activeBatchId: number | null;
-  setActiveBatch: (id: number | null) => void;
-  scanProduct: (barcode: string) => { success: boolean; message: string };
-  interCompanyTransfer: (pickingId: number) => void;
+  activeBatch: PickingBatch | null;
+  syncLogs: SyncLog[];
+  lastScanResult: ScanResult | null;
+  
+  // Actions
+  setActiveBatch: (batchId: number) => void;
+  processBarcode: (barcode: string) => Promise<ScanResult>;
+  forceValidateBatch: () => void;
+  toggleSortOptimization: () => void;
 }
 
-export const useInventoryStore = create<InventoryState>()(
-  persist(
-    (set, get) => ({
-      batches: MOCK_BATCHES,
-      activeBatchId: null,
-      setActiveBatch: (id) => set({ activeBatchId: id }),
-      
-      scanProduct: (barcode) => {
+// Mock Data
+const MOCK_PRODUCTS = [
+  { id: 1, name: 'Acoustic Bloc Screen', barcode: '9780123456789', default_code: 'FURN_6666' },
+  { id: 2, name: 'Corner Desk Right Sit', barcode: '0123456789012', default_code: 'FURN_7777' },
+  { id: 3, name: 'Large Cabinet', barcode: '1234567890123', default_code: 'FURN_8888' },
+];
+
+const MOCK_BATCH: PickingBatch = {
+  id: 101,
+  name: 'BATCH/2023/001',
+  state: 'in_progress',
+  user_id: 1,
+  path_optimized: false,
+  lines: [
+    { id: 1, product_id: MOCK_PRODUCTS[0], qty_done: 0, qty_demand: 5, location_dest: 'WH/STOCK/ROW-3/SHELF-1', state: 'assigned' },
+    { id: 2, product_id: MOCK_PRODUCTS[1], qty_done: 1, qty_demand: 2, location_dest: 'WH/STOCK/ROW-1/SHELF-2', state: 'assigned' },
+    { id: 3, product_id: MOCK_PRODUCTS[2], qty_done: 0, qty_demand: 1, location_dest: 'WH/STOCK/ROW-2/SHELF-5', state: 'assigned' },
+  ]
+};
+
+const MOCK_LOGS: SyncLog[] = [
+  { id: 1, timestamp: '2023-10-27 10:00:01', company_source: 'US-West', company_dest: 'US-East', status: 'success', payload: '{ move: 101 }' },
+  { id: 2, timestamp: '2023-10-27 10:05:22', company_source: 'US-West', company_dest: 'EU-Central', status: 'failed', payload: '{ move: 102 }', error_message: 'Connection Timeout: Destination unreachable' },
+];
+
+export const useInventoryStore = create<InventoryState>((set, get) => ({
+  activeBatch: MOCK_BATCH,
+  syncLogs: MOCK_LOGS,
+  lastScanResult: null,
+
+  setActiveBatch: (id) => {
+    // In real app, fetch from API. Here we just reset mock.
+    set({ activeBatch: { ...MOCK_BATCH, id } });
+  },
+
+  processBarcode: async (barcode) => {
+    // 3.1 High-Speed Barcode Validation Logic Simulation
+    return new Promise((resolve) => {
+      setTimeout(() => {
         const state = get();
-        if (!state.activeBatchId) return { success: false, message: 'No active batch' };
-
-        const batchIndex = state.batches.findIndex(b => b.id === state.activeBatchId);
-        if (batchIndex === -1) return { success: false, message: 'Batch not found' };
-
-        const batch = { ...state.batches[batchIndex] };
-        let scanned = false;
-        let fullyPicked = false;
-
-        // Find matching product in pickings
-        for (const picking of batch.pickings) {
-          for (const move of picking.move_lines) {
-            if (move.product_id.barcode === barcode) {
-              if (move.qty_done < move.product_uom_qty) {
-                move.qty_done += 1;
-                scanned = true;
-                
-                // Check if line completed
-                if (move.qty_done === move.product_uom_qty) {
-                   fullyPicked = true;
-                }
-                break;
-              }
-            }
-          }
-          if (scanned) break;
+        if (!state.activeBatch) {
+          const res: ScanResult = { success: false, message: 'No active batch selected', type: 'business' };
+          set({ lastScanResult: res });
+          resolve(res);
+          return;
         }
 
-        if (scanned) {
-          const newBatches = [...state.batches];
-          newBatches[batchIndex] = batch;
-          set({ batches: newBatches });
-          
-          if (fullyPicked) {
-             audioFeedback.playSuccess();
-             return { success: true, message: 'Line Complete' };
-          }
-          audioFeedback.playWarning(); // Partial
-          return { success: true, message: 'Scanned' };
+        const product = MOCK_PRODUCTS.find(p => p.barcode === barcode);
+        
+        if (!product) {
+          const res: ScanResult = { success: false, message: `Product not found: ${barcode}`, type: 'business' };
+          set({ lastScanResult: res });
+          resolve(res);
+          return;
         }
 
-        audioFeedback.playError();
-        return { success: false, message: 'Invalid Product or Already Done' };
-      },
+        const lineIndex = state.activeBatch.lines.findIndex(l => l.product_id.id === product.id);
+        
+        if (lineIndex === -1) {
+           const res: ScanResult = { success: false, message: `Item ${product.name} not in this batch`, type: 'business' };
+           set({ lastScanResult: res });
+           resolve(res);
+           return;
+        }
 
-      interCompanyTransfer: (pickingId) => {
-        // Simulate ICT logic: Create incoming picking for Company B
-        console.log(`[ICT ENGINE] Triggering ICT for Picking ${pickingId}`);
-        // Implementation would create a new Picking record in state with reversed locations
-      }
-    }),
-    {
-      name: 'odoo-inventory-storage',
+        const line = state.activeBatch.lines[lineIndex];
+        if (line.qty_done >= line.qty_demand) {
+           const res: ScanResult = { success: false, message: `Over-picking blocked for ${product.name}`, type: 'business' };
+           set({ lastScanResult: res });
+           resolve(res);
+           return;
+        }
+
+        // Success Case
+        const newLines = [...state.activeBatch.lines];
+        newLines[lineIndex] = { ...line, qty_done: line.qty_done + 1 };
+        
+        set({
+          activeBatch: { ...state.activeBatch, lines: newLines },
+          lastScanResult: { success: true, message: `Scanned: ${product.name}`, type: 'success', product }
+        });
+
+        resolve({ success: true, message: 'OK', type: 'success' });
+
+      }, 100); // <150ms Latency Requirement
+    });
+  },
+
+  forceValidateBatch: () => {
+    const state = get();
+    if (state.activeBatch) {
+      set({ activeBatch: { ...state.activeBatch, state: 'done' } });
     }
-  )
-);
+  },
+
+  toggleSortOptimization: () => {
+    const state = get();
+    if (!state.activeBatch) return;
+
+    const currentOpt = state.activeBatch.path_optimized;
+    let newLines = [...state.activeBatch.lines];
+
+    if (!currentOpt) {
+      // Sort by location string
+      newLines.sort((a, b) => a.location_dest.localeCompare(b.location_dest));
+    } else {
+      // Revert to ID sort (original order simulation)
+      newLines.sort((a, b) => a.id - b.id);
+    }
+
+    set({ activeBatch: { ...state.activeBatch, lines: newLines, path_optimized: !currentOpt } });
+  }
+}));

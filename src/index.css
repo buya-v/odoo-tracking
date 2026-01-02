@@ -2,14 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --adv-inv-success: #28a745;
+  --adv-inv-error: #dc3545;
+  --adv-inv-warning: #ffc107;
+}
+
 body {
-  font-family: 'Inter', sans-serif;
   background-color: #f8f9fa;
   color: #212529;
 }
 
-/* High-speed scan input optimizations */
-.scan-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 4px rgba(0, 160, 154, 0.25);
+/* Custom scrollbar for mobile feel */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
 }

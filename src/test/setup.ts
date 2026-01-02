@@ -7,34 +7,10 @@ afterEach(() => {
   cleanup();
 });
 
-// Mock AudioContext
-Object.defineProperty(window, 'AudioContext', {
-  writable: true,
-  value: class {
-    createOscillator() {
-      return {
-        connect: () => {},
-        start: () => {},
-        stop: () => {},
-        frequency: { value: 0 },
-        type: ''
-      };
-    }
-    createGain() {
-      return {
-        connect: () => {},
-        gain: {
-          exponentialRampToValueAtTime: () => {}
-        }
-      };
-    }
-    get destination() { return {}; }
-    get currentTime() { return 0; }
-  }
-});
-
-// Mock Navigator Vibrate
+// Mock navigator.vibrate since it's not in JSDOM
 Object.defineProperty(navigator, 'vibrate', {
+  value: (pattern: number | number[]) => {
+    return true;
+  },
   writable: true,
-  value: () => true,
 });
